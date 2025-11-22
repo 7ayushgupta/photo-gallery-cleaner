@@ -6,16 +6,28 @@
 //
 
 import SwiftUI
+import Photos
 
 struct ContentView: View {
+    @State private var isAuthorized = false
+    @State private var authorizationStatus: PHAuthorizationStatus = .notDetermined
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        Group {
+            if isAuthorized {
+                MainReviewScreen()
+            } else {
+                PermissionScreen(isAuthorized: $isAuthorized)
+            }
         }
-        .padding()
+        .onAppear {
+            checkAuthorizationStatus()
+        }
+    }
+    
+    private func checkAuthorizationStatus() {
+        authorizationStatus = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        isAuthorized = authorizationStatus == .authorized || authorizationStatus == .limited
     }
 }
 
